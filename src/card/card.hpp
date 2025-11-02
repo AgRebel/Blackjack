@@ -16,7 +16,7 @@ namespace cards
         CLUB = 1,
         SPADE = 2,
         DIAMOND = 3,
-        LAST
+        LAST = 4
     };
 
     enum class rank
@@ -34,7 +34,7 @@ namespace cards
         JACK = 11,
         QUEEN = 12,
         KING = 13,
-        LAST
+        LAST = 14
     };
 
     auto get_rank_value(const rank& r) -> unsigned int;
