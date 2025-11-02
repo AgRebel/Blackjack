@@ -6,7 +6,10 @@
 #include <random>
 #include <vector>
 
-constexpr auto DECK_SIZE = 52;
+namespace decks
+{
+    constexpr auto DECK_SIZE = 52;
+} // namespace decks
 
 struct deck
 {

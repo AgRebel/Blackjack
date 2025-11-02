@@ -20,10 +20,6 @@ auto create_deck() -> deck
         }
     }
 
-    if (d.size() != DECK_SIZE)
-    {
-        std::cout << std::format("Deck size should be {} but it is {}", DECK_SIZE, d.size());
-    }
     return deck{.cards = std::move(d)};
 }
 

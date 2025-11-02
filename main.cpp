@@ -1,20 +1,23 @@
 #include "card.hpp"
 #include "deck.hpp"
 
+#include <chrono>
 #include <iostream>
+
+#include "util.hpp"
 
 int main() {
     // Random generator setup
-    std::random_device rd;
-    std::mt19937 generator(rd());
+    const std::mt19937 generator(std::chrono::system_clock::now().time_since_epoch().count());
 
     auto d = create_deck();
-    shuffle_deck(d, generator);
-    std::cout << "\n\nShuffled Deck:\n";
-    for (const auto [s, r] : d.cards)
-    {
-        std::cout << cards::get_short_rank_str(r) << cards::get_suit_symbol(s) << " ";
-    }
+    util::log(std::cout, std::format("Unshuffled Deck:\n{}", util::get_compact_deck_string(d)));
 
+    util::log(std::cout, "\n\nShuffled Decks (5 shuffles):\n");
+    for (auto i = 0; i < 5; i++)
+    {
+        shuffle_deck(d, generator);
+        util::log(std::cout, std::format("{}\n", util::get_compact_deck_string(d)));
+    }
     return 0;
 }
