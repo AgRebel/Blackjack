@@ -1,19 +1,15 @@
 #include "card.hpp"
+#include "deck.hpp"
 #include "util.hpp"
 
 #include <iostream>
 
 int main() {
-    std::cout << "Suits:\n";
-    for (cards::suit s : util::iterate_enum(cards::suit::HEART, cards::suit::LAST))
+    auto d = create_deck();
+    std::cout << "Deck:\n";
+    for (const auto [s, r] : d)
     {
-        std::cout << cards::get_suit_str(s) << " ";
-    }
-
-    std::cout << "\n\nRanks:\n";
-    for (cards::rank r : util::iterate_enum(cards::rank::ACE, cards::rank::LAST))
-    {
-        std::cout << cards::get_rank_str(r) << " ";
+        std::cout << get_rank_str(r) << " of " << cards::get_suit_str(s) << "\n";
     }
     return 0;
-}606
+}

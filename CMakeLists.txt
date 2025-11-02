@@ -7,6 +7,7 @@ add_executable(blackjack main.cpp
         card/card.hpp
         card/card.cpp
         util/util.hpp
-        deck/deck.hpp)
+        deck/deck.hpp
+        deck/deck.cpp)
 
-target_include_directories(blackjack PUBLIC ./card ./util)
+target_include_directories(blackjack PUBLIC ./card ./util ./deck)
