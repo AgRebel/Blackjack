@@ -1,15 +1,20 @@
 #include "card.hpp"
 #include "deck.hpp"
-#include "util.hpp"
 
 #include <iostream>
 
 int main() {
+    // Random generator setup
+    std::random_device rd;
+    std::mt19937 generator(rd());
+
     auto d = create_deck();
-    std::cout << "Deck:\n";
-    for (const auto [s, r] : d)
+    shuffle_deck(d, generator);
+    std::cout << "\n\nShuffled Deck:\n";
+    for (const auto [s, r] : d.cards)
     {
-        std::cout << get_rank_str(r) << " of " << cards::get_suit_str(s) << "\n";
+        std::cout << cards::get_short_rank_str(r) << cards::get_suit_symbol(s) << " ";
     }
+
     return 0;
 }

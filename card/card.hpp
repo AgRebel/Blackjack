@@ -34,8 +34,10 @@ namespace cards
 
     auto get_rank_value(const rank& r) -> unsigned int;
     auto get_rank_str(const rank& r) -> std::string;
+    auto get_short_rank_str(const rank& r) -> std::string;
 
     auto get_suit_str(const suit& s) -> std::string;
+    auto get_suit_symbol(const suit& s) -> std::string;
 } // namespace cards
 
 struct card
