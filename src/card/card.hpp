@@ -5,6 +5,11 @@
 
 namespace cards
 {
+    constexpr auto HEART_SYMBOL = "♡";
+    constexpr auto CLUB_SYMBOL = "♣";
+    constexpr auto SPADE_SYMBOL = "♠";
+    constexpr auto DIAMOND_SYMBOL = "♢";
+
     enum class suit
     {
         HEART = 0,

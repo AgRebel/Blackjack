@@ -19,6 +19,7 @@ namespace cards
             case rank::NINE:
                 return std::to_underlying(r);
 
+            case rank::TEN:
             case rank::JACK:
             case rank::QUEEN:
             case rank::KING:
@@ -117,13 +118,13 @@ namespace cards
         switch (s)
         {
             case suit::HEART:
-                return "♡";
+                return cards::HEART_SYMBOL;
             case suit::CLUB:
-                return "♣";
+                return cards::CLUB_SYMBOL;
             case suit::SPADE:
-                return "♠";
+                return cards::SPADE_SYMBOL;
             case suit::DIAMOND:
-                return "♢";
+                return cards::DIAMOND_SYMBOL;
             default:
                 return "⌨"; // hopefully drawing the Ace of Keyboards alerts us to a problem
         }

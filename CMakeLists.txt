@@ -3,11 +3,28 @@ project(blackjack)
 
 set(CMAKE_CXX_STANDARD 23)
 
-add_executable(blackjack main.cpp
-        card/card.hpp
-        card/card.cpp
-        util/util.hpp
-        deck/deck.hpp
-        deck/deck.cpp)
+set(SOURCE_DIR "src")
+set(TEST_DIR "test")
+set(INCLUDE_DIRS
+        "${SOURCE_DIR}/card"
+        "${SOURCE_DIR}/deck"
+        "${SOURCE_DIR}/util"
+        "${TEST_DIR}"
+)
 
-target_include_directories(blackjack PUBLIC ./card ./util ./deck)
+add_executable(blackjack main.cpp
+        ${SOURCE_DIR}/card/card.cpp
+        ${SOURCE_DIR}/deck/deck.cpp)
+target_include_directories(blackjack PUBLIC ${INCLUDE_DIRS})
+
+find_package(Catch2 3 REQUIRED)
+
+add_executable(tests
+        ${TEST_DIR}/unit/card_unittest.cpp
+        ${SOURCE_DIR}/card/card.cpp
+        ${SOURCE_DIR}/deck/deck.cpp)
+target_link_libraries(tests PRIVATE Catch2::Catch2WithMain)
+target_include_directories(tests PUBLIC ${TEST_DIR}/unit ${INCLUDE_DIRS})
+include(CTest)
+include(Catch)
+catch_discover_tests(tests)
