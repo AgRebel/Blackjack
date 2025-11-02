@@ -6,12 +6,9 @@
 #include "card.hpp"
 #include "util.hpp"
 
-#include <format>
-#include <iostream>
-
 auto create_deck() -> deck
 {
-    std::vector<card> d;
+    std::deque<card> d;
     for (const cards::suit s : util::iterate_enum(cards::suit::HEART, cards::suit::LAST))
     {
         for (const cards::rank r : util::iterate_enum(cards::rank::ACE, cards::rank::LAST))

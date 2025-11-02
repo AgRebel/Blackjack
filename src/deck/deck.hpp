@@ -4,7 +4,7 @@
 #include "card.hpp"
 
 #include <random>
-#include <vector>
+#include <deque>
 
 namespace decks
 {
@@ -13,7 +13,7 @@ namespace decks
 
 struct deck
 {
-    std::vector<card> cards;
+    std::deque<card> cards;
 };
 
 auto create_deck() -> deck;
