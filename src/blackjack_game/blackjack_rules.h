@@ -1,0 +1,8 @@
+#ifndef BLACKJACK_BLACKJACK_RULES_H
+#define BLACKJACK_BLACKJACK_RULES_H
+
+constexpr auto MAX_SCORE = 21;
+constexpr auto DEALER_HITS_ON_SOFT_17 = true;
+constexpr auto DEALER_STAND_TOTAL = 17;
+
+#endif //BLACKJACK_BLACKJACK_RULES_H

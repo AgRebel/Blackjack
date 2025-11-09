@@ -10,6 +10,7 @@ set(INCLUDE_DIRS
         "${SOURCE_DIR}/deck"
         "${SOURCE_DIR}/util"
         "${SOURCE_DIR}/player"
+        "${SOURCE_DIR}/blackjack_game"
         "${TEST_DIR}"
 )
 
@@ -18,7 +19,10 @@ add_executable(blackjack main.cpp
         ${SOURCE_DIR}/deck/deck.cpp
         ${SOURCE_DIR}/player/player.cpp
         ${SOURCE_DIR}/util/util.cpp
-        ${SOURCE_DIR}/util/blackjack_utils.cpp)
+        ${SOURCE_DIR}/blackjack_game/blackjack_game_functions.cpp
+        ${SOURCE_DIR}/blackjack_game/blackjack_rules.h
+        ${SOURCE_DIR}/blackjack_game/blackjack_game_loop.hpp
+        ${SOURCE_DIR}/blackjack_game/blackjack_game_loop.cpp)
 target_include_directories(blackjack PUBLIC ${INCLUDE_DIRS})
 
 find_package(Catch2 3 REQUIRED)
@@ -28,7 +32,7 @@ add_executable(tests
         ${SOURCE_DIR}/deck/deck.cpp
         ${SOURCE_DIR}/player/player.cpp
         ${SOURCE_DIR}/util/util.cpp
-        ${SOURCE_DIR}/util/blackjack_utils.cpp
+        ${SOURCE_DIR}/blackjack_game/blackjack_game_functions.cpp
         ${TEST_DIR}/unit/card_unittest.cpp
         ${TEST_DIR}/unit/deck_unittest.cpp
         ${TEST_DIR}/unit/blackjack_unittest.cpp)

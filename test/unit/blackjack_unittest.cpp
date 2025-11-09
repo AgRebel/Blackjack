@@ -1,4 +1,4 @@
-#include "blackjack_utils.hpp"
+#include "../../src/blackjack_game/blackjack_game_functions.hpp"
 #include "card.hpp"
 #include "deck.hpp"
 #include "player.hpp"
