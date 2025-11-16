@@ -13,7 +13,7 @@ struct player
 
 namespace players
 {
-    auto get_hand_str(const player& p) -> std::string;
+    auto get_hand_str(const std::vector<card>& hand) -> std::string;
 } // namespace player
 
 #endif //BLACKJACK_PLAYER_HPP

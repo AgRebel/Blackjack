@@ -6,7 +6,7 @@
 #include <iostream>
 #include <unordered_map>
 
-constexpr auto NUM_HANDS = 1000;
+constexpr auto NUM_HANDS = 100000;
 constexpr auto LOG_TO_STD_OUT = false; // set to true for more detailed per-game logging
 
 int main() {
@@ -20,7 +20,7 @@ int main() {
     for (int i = 0; i < NUM_HANDS; ++i)
     {
         util::log(os, std::format("Game {}\n", i + 1));
-        winners.emplace_back(blackjack::blackjack_game(generator, false, os));
+        winners.emplace_back(blackjack::blackjack_game(generator, false, os, strategies::simple_strategy));
     }
 
     const auto end_time = std::chrono::system_clock::now().time_since_epoch();
