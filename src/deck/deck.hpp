@@ -18,6 +18,8 @@ struct deck
 
 auto create_deck() -> deck;
 
-auto shuffle_deck(deck& d, std::mt19937 g) -> void;
+auto get_compact_deck_string(const deck& d) -> std::string;
+
+auto shuffle_deck(deck& d, std::mt19937& g) -> void;
 
 #endif //BLACKJACK_DECK_HPP
