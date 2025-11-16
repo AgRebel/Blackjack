@@ -8,5 +8,5 @@ int main() {
     // Random generator setup
     const std::mt19937 generator(std::chrono::system_clock::now().time_since_epoch().count());
 
-    return blackjack_game_loop(generator);
+    return blackjack_game_loop(generator);;
 }

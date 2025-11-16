@@ -12,11 +12,12 @@
 
 auto dealer_turn(player& dealer, deck& d) -> void
 {
-    auto score = blackjack::hand_score(dealer.hand);
-    while (score < DEALER_STAND_TOTAL)
+    using namespace blackjack;
+    auto score = hand_score(dealer.hand);
+    while (score < DEALER_STAND_TOTAL or (score == DEALER_STAND_TOTAL and has_ace(dealer.hand) and DEALER_HITS_ON_SOFT_17))
     {
-        blackjack::hit(dealer, d);
-        score = blackjack::hand_score(dealer.hand);
+        hit(dealer, d);
+        score = hand_score(dealer.hand);
         util::log(std::cout, "Dealer hand:\n");
         util::log(std::cout, std::format("{}\n", players::get_hand_str(dealer)));
     }
@@ -24,7 +25,8 @@ auto dealer_turn(player& dealer, deck& d) -> void
 
 auto player_turn(player& p, deck& d) -> void
 {
-    auto score = blackjack::hand_score(p.hand);
+    using namespace blackjack;
+    auto score = hand_score(p.hand);
     char play = 'a';
     while (score <= MAX_SCORE && play != 's')
     {
@@ -32,14 +34,14 @@ auto player_turn(player& p, deck& d) -> void
         std::cin >> play;
         if (play == 'h')
         {
-            blackjack::hit(p, d);
+            hit(p, d);
         }
         else if (play != 's')
         {
             std::cout << "Input must be h for hit or s for stay\n";
             continue;
         }
-        score = blackjack::hand_score(p.hand);
+        score = hand_score(p.hand);
         util::log(std::cout, "Player hand:\n");
         util::log(std::cout, std::format("{}\n", players::get_hand_str(p)));
     }
@@ -47,6 +49,7 @@ auto player_turn(player& p, deck& d) -> void
 
 auto blackjack_game_loop(std::mt19937 generator) -> int
 {
+    using namespace blackjack;
     auto d = create_deck();
 
     shuffle_deck(d, generator);
@@ -56,7 +59,7 @@ auto blackjack_game_loop(std::mt19937 generator) -> int
     players.push_back(player{.is_dealer = true, .hand{}});
     players.push_back(player{.is_dealer = false, .hand{}});
 
-    blackjack::initial_deal(players, d);
+    initial_deal(players, d);
     util::log(std::cout, "Hands:\n");
     std::ranges::for_each(players, [](auto& p)
     {
@@ -70,8 +73,8 @@ auto blackjack_game_loop(std::mt19937 generator) -> int
     // once player is done, dealer's turn
     dealer_turn(players[0], d);
 
-    auto dealer_score = blackjack::hand_score(players[0].hand);
-    auto player_score = blackjack::hand_score(players[1].hand);
+    auto dealer_score = hand_score(players[0].hand);
+    auto player_score = hand_score(players[1].hand);
 
     util::log(std::cout, std::format("Dealer score: {}\n", dealer_score <= MAX_SCORE ? std::to_string(dealer_score) : "Bust"));
     util::log(std::cout, std::format("Player score: {}\n", player_score <= MAX_SCORE ? std::to_string(player_score) : "Bust"));
