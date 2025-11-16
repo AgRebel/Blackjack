@@ -87,41 +87,41 @@ TEST_CASE("Scoring")
 
     REQUIRE(hand.size() == 2);
     // Ace + 8
-    REQUIRE(blackjack::hand_score(hand) == 19);
+    REQUIRE(hand_score(hand) == 19);
     hand.emplace_back(card{.s = cards::suit::DIAMOND, .r = cards::rank::ACE});
     // Ace + 8 + Ace
-    REQUIRE(blackjack::hand_score(hand) == 20);
+    REQUIRE(hand_score(hand) == 20);
     // Ace + 8 + Ace + 7
     hand.emplace_back(card{.s = cards::suit::DIAMOND, .r = cards::rank::SEVEN});
-    REQUIRE(blackjack::hand_score(hand) == 17);
+    REQUIRE(hand_score(hand) == 17);
 
     hand.clear();
     hand.emplace_back(card{.s = cards::suit::DIAMOND, .r = cards::rank::ACE});
     hand.emplace_back(card{.s = cards::suit::DIAMOND, .r = cards::rank::TWO});
     // Ace + 2
-    REQUIRE(blackjack::hand_score(hand) == 13);
+    REQUIRE(hand_score(hand) == 13);
 
     // Blackjack
     hand.clear();
     hand.emplace_back(card{.s = cards::suit::DIAMOND, .r = cards::rank::ACE});
     hand.emplace_back(card{.s = cards::suit::DIAMOND, .r = cards::rank::TEN});
-    REQUIRE(blackjack::hand_score(hand) == 21);
-    REQUIRE(blackjack::has_blackjack(hand));
+    REQUIRE(hand_score(hand) == MAX_SCORE);
+    REQUIRE(has_blackjack(hand));
 
     hand.pop_back();
     hand.emplace_back(card{.s = cards::suit::DIAMOND, .r = cards::rank::JACK});
-    REQUIRE(blackjack::hand_score(hand) == 21);
-    REQUIRE(blackjack::has_blackjack(hand));
+    REQUIRE(hand_score(hand) == MAX_SCORE);
+    REQUIRE(has_blackjack(hand));
 
     hand.pop_back();
     hand.emplace_back(card{.s = cards::suit::DIAMOND, .r = cards::rank::QUEEN});
-    REQUIRE(blackjack::hand_score(hand) == 21);
-    REQUIRE(blackjack::has_blackjack(hand));
+    REQUIRE(hand_score(hand) == MAX_SCORE);
+    REQUIRE(has_blackjack(hand));
 
     hand.pop_back();
     hand.emplace_back(card{.s = cards::suit::DIAMOND, .r = cards::rank::KING});
-    REQUIRE(blackjack::hand_score(hand) == 21);
-    REQUIRE(blackjack::has_blackjack(hand));
+    REQUIRE(hand_score(hand) == MAX_SCORE);
+    REQUIRE(has_blackjack(hand));
 }
 
 TEST_CASE("Automated games")
