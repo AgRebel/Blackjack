@@ -1,9 +1,10 @@
-#include "blackjack_game_functions.hpp"
+#include "blackjack_game_utils.hpp"
 
 #include "../util/util.hpp"
 
-#include "blackjack_rules.h"
+#include "blackjack_rules.hpp"
 
+#include <algorithm>
 
 namespace blackjack
 {
@@ -61,5 +62,15 @@ namespace blackjack
         const auto c = d.cards.front();
         d.cards.pop_front();
         return c;
+    }
+
+    [[maybe_unused]] auto print_hands(std::vector<player> players, std::ostream* os) -> void
+    {
+        util::log(os, "Hands:\n");
+        std::ranges::for_each(players, [os](auto& p)
+        {
+            std::string player_type = p.is_dealer ? "Dealer: " : "Player: ";
+            util::log(os, std::format("{}{}\n", player_type, players::get_hand_str(p)));
+        });
     }
 } // namespace blackjack

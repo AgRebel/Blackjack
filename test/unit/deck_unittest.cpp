@@ -9,7 +9,7 @@
 
 auto print_two_decks(const deck& d1, const deck&d2) -> void
 {
-    util::log(std::cout, std::format("first deck:{}\nsecond deck:\n{}\n\b", util::get_compact_deck_string(d1), util::get_compact_deck_string(d2)));
+    util::log(&std::cout, std::format("first deck:{}\nsecond deck:\n{}\n\b", get_compact_deck_string(d1), get_compact_deck_string(d2)));
 }
 
 TEST_CASE("Deck creation")

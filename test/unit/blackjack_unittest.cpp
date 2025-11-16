@@ -1,4 +1,6 @@
-#include "blackjack_game_functions.hpp"
+#include "blackjack_game.hpp"
+#include "blackjack_game_utils.hpp"
+#include "blackjack_rules.hpp"
 #include "card.hpp"
 #include "deck.hpp"
 #include "player.hpp"
@@ -9,13 +11,9 @@
 #include <expected>
 #include <iostream>
 
-auto get_generator() -> std::mt19937
-{
-    return std::mt19937(std::chrono::system_clock::now().time_since_epoch().count());
-}
-
 auto setup_table(int num_players) -> std::pair<std::vector<player>, deck>
 {
+    std::mt19937 generator(std::chrono::system_clock::now().time_since_epoch().count());
     std::vector<player> players{
         player{.is_dealer = true, .hand = {}}
     };
@@ -26,7 +24,7 @@ auto setup_table(int num_players) -> std::pair<std::vector<player>, deck>
     }
 
     auto d = create_deck();
-    shuffle_deck(d, get_generator());
+    shuffle_deck(d, generator);
 
     return {players, d};
 }
@@ -41,14 +39,14 @@ TEST_CASE("Dealing with 2 players")
     {
         top_cards.emplace_back(d.cards.at(i));
     }
-    util::log(std::cout, std::format("Deck:\n{}\n", util::get_compact_deck_string(d)));
+    util::log(&std::cout, std::format("Deck:\n{}\n", get_compact_deck_string(d)));
 
     blackjack::initial_deal(players, d);
 
-    util::log(std::cout, "Hands:\n");
+    util::log(&std::cout, "Hands:\n");
     for (const auto p : players)
     {
-        util::log(std::cout, std::format("{}\n", players::get_hand_str(p)));
+        util::log(&std::cout, std::format("{}\n", players::get_hand_str(p)));
     }
 
     auto iter = top_cards.begin();
@@ -61,7 +59,7 @@ TEST_CASE("Dealing with 2 players")
             ++iter;
         }
     }
-    util::log(std::cout, std::format("Deck:\n{}\n", util::get_compact_deck_string(d)));
+    util::log(&std::cout, std::format("Deck:\n{}\n", get_compact_deck_string(d)));
 }
 
 TEST_CASE("Hitting")
@@ -101,4 +99,34 @@ TEST_CASE("Scoring")
     p.hand.emplace_back(card{.s = cards::suit::DIAMOND, .r = cards::rank::TWO});
     // Ace + 2
     REQUIRE(blackjack::hand_score(p.hand) == 13);
+}
+
+TEST_CASE("Automated games")
+{
+    std::mt19937 generator(std::chrono::system_clock::now().time_since_epoch().count());
+    auto num_games = 100000;
+
+    std::vector<blackjack::Winner> winners{};
+
+    for (int i = 0; i < num_games; ++i)
+    {
+        winners.emplace_back(blackjack::blackjack_game(generator, false, nullptr));
+    }
+
+    std::unordered_map<blackjack::Winner, int> win_counts;
+    for (auto winner : winners)
+    {
+        win_counts[winner]++;
+    }
+
+    const auto dealer_wins = win_counts[blackjack::Winner::DEALER];
+    const auto player_wins = win_counts[blackjack::Winner::PLAYER];
+    const auto pushes = win_counts[blackjack::Winner::PUSH];
+
+    util::log(&std::cout, std::format("Number of games run: {}\n", num_games));
+    util::log(&std::cout, std::format("Dealer wins: {}\n", win_counts[blackjack::Winner::DEALER]));
+    util::log(&std::cout, std::format("Player wins: {}\n", win_counts[blackjack::Winner::PLAYER]));
+    util::log(&std::cout, std::format("Pushes: {}\n", win_counts[blackjack::Winner::PUSH]));
+
+    REQUIRE(dealer_wins + player_wins + pushes == num_games);
 }

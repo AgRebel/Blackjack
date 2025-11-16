@@ -20,7 +20,17 @@ auto create_deck() -> deck
     return deck{.cards = std::move(d)};
 }
 
-auto shuffle_deck(deck& d, std::mt19937 g) -> void
+auto get_compact_deck_string(const deck &d) -> std::string
+{
+    std::string deck_string;
+    for (const auto [s, r] : d.cards)
+    {
+        deck_string.append(cards::get_short_rank_str(r) + cards::get_suit_symbol(s) + " ");
+    }
+    return deck_string;
+}
+
+auto shuffle_deck(deck& d, std::mt19937& g) -> void
 {
     std::ranges::shuffle(d.cards, g);
 }
