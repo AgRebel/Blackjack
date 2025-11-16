@@ -10,6 +10,8 @@
 
 #include <iostream>
 
+using namespace blackjack;
+
 auto setup_table(int num_players) -> std::pair<std::vector<player>, deck>
 {
     std::mt19937 generator(std::chrono::system_clock::now().time_since_epoch().count());
@@ -51,10 +53,10 @@ TEST_CASE("Dealing with 2 players")
     auto iter = top_cards.begin();
     for (int i = 0; i < num_players; ++i)
     {
-        for (auto&[is_dealer, hand] : players)
+        for (auto& p : players)
         {
-            REQUIRE(hand.at(i).s == iter->s);
-            REQUIRE(hand.at(i).r == iter->r);
+            REQUIRE(p.hand.at(i).s == iter->s);
+            REQUIRE(p.hand.at(i).r == iter->r);
             ++iter;
         }
     }
@@ -124,15 +126,17 @@ TEST_CASE("Scoring")
 
 TEST_CASE("Automated games")
 {
-    using namespace blackjack;
     std::mt19937 generator(std::chrono::system_clock::now().time_since_epoch().count());
     constexpr auto num_games = 100000;
 
     std::vector<Winner> winners{};
+    std::vector<player> players{};
+    players.push_back(player{.is_dealer = true, .hand{}});
+    players.push_back(player{.is_dealer = false, .hand{}, .bankroll = 500.0});
 
     for (int i = 0; i < num_games; ++i)
     {
-        winners.emplace_back(blackjack_game(generator, false, nullptr));
+        winners.emplace_back(blackjack_game(generator, players, false, nullptr));
     }
 
     std::unordered_map<Winner, int> win_counts;
@@ -146,4 +150,31 @@ TEST_CASE("Automated games")
             win_counts[Winner::PUSH] +
             win_counts[Winner::DEALER_BLACKJACK] +
             win_counts[Winner::PLAYER_BLACKJACK]  == num_games);
+}
+
+TEST_CASE("Bet payouts")
+{
+    for (const Winner w : util::iterate_enum(Winner::DEALER, Winner::LAST))
+    {
+        constexpr double bet = 10;
+        switch(w)
+        {
+            case Winner::DEALER:
+            case Winner::DEALER_BLACKJACK:
+                REQUIRE(distribute_winnings(w, bet) == 0.0);
+                break;
+            case Winner::PLAYER_BLACKJACK:
+                REQUIRE(distribute_winnings(w, bet) == bet + bet * BLACKJACK_PAYOUT);
+                break;
+            case Winner::PLAYER:
+                REQUIRE(distribute_winnings(w, bet) == bet * 2.0);
+                break;
+            case Winner::PUSH:
+                REQUIRE(distribute_winnings(w, bet) == bet);
+                break;
+            default:
+                REQUIRE(distribute_winnings(w, bet) == bet);
+                break;
+        }
+    }
 }

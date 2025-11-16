@@ -65,19 +65,22 @@ namespace
 
 namespace blackjack
 {
-    auto blackjack_game(std::mt19937& generator, const bool manual, std::ostream* os, const strategy &s) -> Winner
+    auto blackjack_game(std::mt19937& generator,
+                        std::vector<player>& players,
+                        const bool manual,
+                        std::ostream* os,
+                        const strategy &s) -> Winner
     {
         auto d = create_deck();
 
         shuffle_deck(d, generator);
 
-        // One dealer and one player for now
-        std::vector<player> players{};
-        players.push_back(player{.is_dealer = true, .hand{}});
-        players.push_back(player{.is_dealer = false, .hand{}});
+        auto& dealer = players.front();
+        auto& player1 = players.at(1);
 
-        player& dealer = players.front();
-        player& player1 = players.at(1);
+        // Ensure empty hands
+        dealer.hand.clear();
+        player1.hand.clear();
 
         initial_deal(players, d);
         if (has_blackjack(dealer.hand))
