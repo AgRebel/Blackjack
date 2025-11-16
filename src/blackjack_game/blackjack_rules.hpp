@@ -14,7 +14,9 @@ namespace blackjack
     {
         DEALER = 0,
         PLAYER = 1,
-        PUSH = 2
+        PUSH = 2,
+        DEALER_BLACKJACK = 3,
+        PLAYER_BLACKJACK = 4
     };
 
     inline std::string to_string(const Winner& w)

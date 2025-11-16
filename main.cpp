@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include "blackjack_game.hpp"
 #include "blackjack_game_utils.hpp"
 #include "util.hpp"
@@ -32,9 +34,17 @@ int main() {
         win_counts[winner]++;
     }
 
+    auto total_games = std::accumulate(win_counts.begin(), win_counts.end(), 0,
+                              [](const int sum, const std::pair<const blackjack::Winner, int>& pair) {
+                                  return sum + pair.second;
+                              });
+
     // I always want to log these to cout
-    util::log(&std::cout, std::format("Dealer wins: {}\n", win_counts[blackjack::Winner::DEALER]));
-    util::log(&std::cout, std::format("Player wins: {}\n", win_counts[blackjack::Winner::PLAYER]));
+    util::log(&std::cout, std::format("Hands played: {}\n", total_games)); // sanity check
+    util::log(&std::cout, std::format("Dealer wins minus blackjack: {}\n", win_counts[blackjack::Winner::DEALER]));
+    util::log(&std::cout, std::format("Player wins minus blackjack: {}\n", win_counts[blackjack::Winner::PLAYER]));
+    util::log(&std::cout, std::format("Player blackjacks: {}\n", win_counts[blackjack::Winner::PLAYER_BLACKJACK]));
+    util::log(&std::cout, std::format("Dealer blackjacks: {}\n", win_counts[blackjack::Winner::DEALER_BLACKJACK]));
     util::log(&std::cout, std::format("Pushes: {}\n", win_counts[blackjack::Winner::PUSH]));
     util::log(&std::cout, std::format("Time taken: {}ms", time_spent));
 

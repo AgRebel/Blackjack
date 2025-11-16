@@ -80,6 +80,14 @@ namespace blackjack
         player& player1 = players.at(1);
 
         initial_deal(players, d);
+        if (has_blackjack(dealer.hand))
+        {
+            return Winner::DEALER_BLACKJACK;
+        }
+        if (has_blackjack(player1.hand))
+        {
+            return Winner::PLAYER_BLACKJACK;
+        }
 
         // player(s)' turn(s); could be manual or automated
         manual ? manual_player_turn(player1, d) :
@@ -88,8 +96,8 @@ namespace blackjack
         // dealer turn; dealer always automated according to rules
         dealer_turn(dealer, d);
 
-        auto dealer_score = hand_score(dealer.hand);
-        auto player_score = hand_score(player1.hand);
+        const auto dealer_score = hand_score(dealer.hand);
+        const auto player_score = hand_score(player1.hand);
 
         util::log(os, std::format("Dealer score: {}\n", dealer_score <= MAX_SCORE ? std::to_string(dealer_score) : "Bust"));
         util::log(os, std::format("Player score: {}\n\n", player_score <= MAX_SCORE ? std::to_string(player_score) : "Bust"));

@@ -78,54 +78,72 @@ TEST_CASE("Hitting")
 
 TEST_CASE("Scoring")
 {
-    player p{.is_dealer = true,
-        .hand = {card{.s = cards::suit::SPADE, .r = cards::rank::ACE},
-                {card{.s = cards::suit::CLUB, .r = cards::rank::EIGHT}}}
-        };
+    std::vector<card> hand = {
+        card{.s = cards::suit::SPADE, .r = cards::rank::ACE},
+       card{.s = cards::suit::CLUB, .r = cards::rank::EIGHT}};
 
-    REQUIRE(p.hand.size() == 2);
+
+    REQUIRE(hand.size() == 2);
     // Ace + 8
-    REQUIRE(blackjack::hand_score(p.hand) == 19);
-    p.hand.emplace_back(card{.s = cards::suit::DIAMOND, .r = cards::rank::ACE});
+    REQUIRE(blackjack::hand_score(hand) == 19);
+    hand.emplace_back(card{.s = cards::suit::DIAMOND, .r = cards::rank::ACE});
     // Ace + 8 + Ace
-    REQUIRE(blackjack::hand_score(p.hand) == 20);
+    REQUIRE(blackjack::hand_score(hand) == 20);
     // Ace + 8 + Ace + 7
-    p.hand.emplace_back(card{.s = cards::suit::DIAMOND, .r = cards::rank::SEVEN});
-    REQUIRE(blackjack::hand_score(p.hand) == 17);
+    hand.emplace_back(card{.s = cards::suit::DIAMOND, .r = cards::rank::SEVEN});
+    REQUIRE(blackjack::hand_score(hand) == 17);
 
-    p.hand.clear();
-    p.hand.emplace_back(card{.s = cards::suit::DIAMOND, .r = cards::rank::ACE});
-    p.hand.emplace_back(card{.s = cards::suit::DIAMOND, .r = cards::rank::TWO});
+    hand.clear();
+    hand.emplace_back(card{.s = cards::suit::DIAMOND, .r = cards::rank::ACE});
+    hand.emplace_back(card{.s = cards::suit::DIAMOND, .r = cards::rank::TWO});
     // Ace + 2
-    REQUIRE(blackjack::hand_score(p.hand) == 13);
+    REQUIRE(blackjack::hand_score(hand) == 13);
+
+    // Blackjack
+    hand.clear();
+    hand.emplace_back(card{.s = cards::suit::DIAMOND, .r = cards::rank::ACE});
+    hand.emplace_back(card{.s = cards::suit::DIAMOND, .r = cards::rank::TEN});
+    REQUIRE(blackjack::hand_score(hand) == 21);
+    REQUIRE(blackjack::has_blackjack(hand));
+
+    hand.pop_back();
+    hand.emplace_back(card{.s = cards::suit::DIAMOND, .r = cards::rank::JACK});
+    REQUIRE(blackjack::hand_score(hand) == 21);
+    REQUIRE(blackjack::has_blackjack(hand));
+
+    hand.pop_back();
+    hand.emplace_back(card{.s = cards::suit::DIAMOND, .r = cards::rank::QUEEN});
+    REQUIRE(blackjack::hand_score(hand) == 21);
+    REQUIRE(blackjack::has_blackjack(hand));
+
+    hand.pop_back();
+    hand.emplace_back(card{.s = cards::suit::DIAMOND, .r = cards::rank::KING});
+    REQUIRE(blackjack::hand_score(hand) == 21);
+    REQUIRE(blackjack::has_blackjack(hand));
 }
 
 TEST_CASE("Automated games")
 {
+    using namespace blackjack;
     std::mt19937 generator(std::chrono::system_clock::now().time_since_epoch().count());
-    auto num_games = 100000;
+    constexpr auto num_games = 100000;
 
-    std::vector<blackjack::Winner> winners{};
+    std::vector<Winner> winners{};
 
     for (int i = 0; i < num_games; ++i)
     {
-        winners.emplace_back(blackjack::blackjack_game(generator, false, nullptr));
+        winners.emplace_back(blackjack_game(generator, false, nullptr));
     }
 
-    std::unordered_map<blackjack::Winner, int> win_counts;
+    std::unordered_map<Winner, int> win_counts;
     for (auto winner : winners)
     {
         win_counts[winner]++;
     }
 
-    const auto dealer_wins = win_counts[blackjack::Winner::DEALER];
-    const auto player_wins = win_counts[blackjack::Winner::PLAYER];
-    const auto pushes = win_counts[blackjack::Winner::PUSH];
-
-    util::log(&std::cout, std::format("Number of games run: {}\n", num_games));
-    util::log(&std::cout, std::format("Dealer wins: {}\n", win_counts[blackjack::Winner::DEALER]));
-    util::log(&std::cout, std::format("Player wins: {}\n", win_counts[blackjack::Winner::PLAYER]));
-    util::log(&std::cout, std::format("Pushes: {}\n", win_counts[blackjack::Winner::PUSH]));
-
-    REQUIRE(dealer_wins + player_wins + pushes == num_games);
+    REQUIRE(win_counts[Winner::DEALER] +
+            win_counts[Winner::PLAYER] +
+            win_counts[Winner::PUSH] +
+            win_counts[Winner::DEALER_BLACKJACK] +
+            win_counts[Winner::PLAYER_BLACKJACK]  == num_games);
 }
