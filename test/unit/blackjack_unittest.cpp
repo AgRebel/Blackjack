@@ -1,4 +1,4 @@
-#include "blackjack_utils.hpp"
+#include "blackjack_game_functions.hpp"
 #include "card.hpp"
 #include "deck.hpp"
 #include "player.hpp"
@@ -6,26 +6,45 @@
 
 #include <catch2/catch_all.hpp>
 
+#include <expected>
 #include <iostream>
+
+auto get_generator() -> std::mt19937
+{
+    return std::mt19937(std::chrono::system_clock::now().time_since_epoch().count());
+}
+
+auto setup_table(int num_players) -> std::pair<std::vector<player>, deck>
+{
+    std::vector<player> players{
+        player{.is_dealer = true, .hand = {}}
+    };
+
+    for (int i = 1; i < num_players; ++i)
+    {
+        players.emplace_back(player{.is_dealer = false, .hand = {}});
+    }
+
+    auto d = create_deck();
+    shuffle_deck(d, get_generator());
+
+    return {players, d};
+}
 
 TEST_CASE("Dealing with 2 players")
 {
-    auto num_players = 2;
-    std::vector<player> players{
-        player{.is_dealer = true, .hand = {}},
-        player{.is_dealer = false, .hand = {}}
-    };
+    constexpr auto num_players = 2;
+    auto [players, d] = setup_table(num_players);
 
-    auto d = create_deck();
-    std::mt19937 generator(std::chrono::system_clock::now().time_since_epoch().count());
-    shuffle_deck(d, generator);
     std::vector<card> top_cards = {};
     for (int i = 0; i < 2 * num_players; ++i)
     {
         top_cards.emplace_back(d.cards.at(i));
     }
     util::log(std::cout, std::format("Deck:\n{}\n", util::get_compact_deck_string(d)));
+
     blackjack::initial_deal(players, d);
+
     util::log(std::cout, "Hands:\n");
     for (const auto p : players)
     {
@@ -43,4 +62,43 @@ TEST_CASE("Dealing with 2 players")
         }
     }
     util::log(std::cout, std::format("Deck:\n{}\n", util::get_compact_deck_string(d)));
+}
+
+TEST_CASE("Hitting")
+{
+    constexpr auto num_players = 2;
+    auto [players, d] = setup_table(num_players);
+
+    blackjack::initial_deal(players, d);
+    REQUIRE(players[1].hand.size() == 2);
+
+    //Hit a few times
+    blackjack::hit(players[1], d);
+    REQUIRE(players[1].hand.size() == 3);
+    blackjack::hit(players[1], d);
+    REQUIRE(players[1].hand.size() == 4);
+}
+
+TEST_CASE("Scoring")
+{
+    player p{.is_dealer = true,
+        .hand = {card{.s = cards::suit::SPADE, .r = cards::rank::ACE},
+                {card{.s = cards::suit::CLUB, .r = cards::rank::EIGHT}}}
+        };
+
+    REQUIRE(p.hand.size() == 2);
+    // Ace + 8
+    REQUIRE(blackjack::hand_score(p.hand) == 19);
+    p.hand.emplace_back(card{.s = cards::suit::DIAMOND, .r = cards::rank::ACE});
+    // Ace + 8 + Ace
+    REQUIRE(blackjack::hand_score(p.hand) == 20);
+    // Ace + 8 + Ace + 7
+    p.hand.emplace_back(card{.s = cards::suit::DIAMOND, .r = cards::rank::SEVEN});
+    REQUIRE(blackjack::hand_score(p.hand) == 17);
+
+    p.hand.clear();
+    p.hand.emplace_back(card{.s = cards::suit::DIAMOND, .r = cards::rank::ACE});
+    p.hand.emplace_back(card{.s = cards::suit::DIAMOND, .r = cards::rank::TWO});
+    // Ace + 2
+    REQUIRE(blackjack::hand_score(p.hand) == 13);
 }

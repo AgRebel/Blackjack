@@ -9,6 +9,9 @@
 
 namespace blackjack
 {
+    auto hand_score(const std::vector<card>& c) -> int;
+    auto has_ace(const std::vector<card>& hand) -> bool;
+    auto hit(player& p, deck& d) -> void;
     auto initial_deal(std::vector<player>& players, deck& d) -> void;
     auto top_card(deck& d) -> card;
 } // namespace blackjack
