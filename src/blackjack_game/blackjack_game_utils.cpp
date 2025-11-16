@@ -70,7 +70,7 @@ namespace blackjack
         std::ranges::for_each(players, [os](auto& p)
         {
             std::string player_type = p.is_dealer ? "Dealer: " : "Player: ";
-            util::log(os, std::format("{}{}\n", player_type, players::get_hand_str(p)));
+            util::log(os, std::format("{}{}\n", player_type, players::get_hand_str(p.hand)));
         });
     }
 } // namespace blackjack

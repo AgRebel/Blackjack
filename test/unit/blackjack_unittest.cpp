@@ -8,13 +8,12 @@
 
 #include <catch2/catch_all.hpp>
 
-#include <expected>
 #include <iostream>
 
 auto setup_table(int num_players) -> std::pair<std::vector<player>, deck>
 {
     std::mt19937 generator(std::chrono::system_clock::now().time_since_epoch().count());
-    std::vector<player> players{
+    std::vector players{
         player{.is_dealer = true, .hand = {}}
     };
 
@@ -46,7 +45,7 @@ TEST_CASE("Dealing with 2 players")
     util::log(&std::cout, "Hands:\n");
     for (const auto p : players)
     {
-        util::log(&std::cout, std::format("{}\n", players::get_hand_str(p)));
+        util::log(&std::cout, std::format("{}\n", players::get_hand_str(p.hand)));
     }
 
     auto iter = top_cards.begin();
