@@ -44,7 +44,7 @@ TEST_CASE("Simple strategy")
         {
             hand.clear();
             hand.emplace_back(card{.s = cards::suit::DIAMOND, .r = cards::rank::ACE});
-            hand.emplace_back(card{.s = cards::suit::DIAMOND, .r = cards::rank::TEN});
+            hand.emplace_back(card{.s = cards::suit::DIAMOND, .r = cards::rank::FIVE});
 
             for (const cards::rank r : util::iterate_enum(cards::rank::ACE, cards::rank::LAST))
             {

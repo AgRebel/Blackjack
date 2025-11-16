@@ -9,6 +9,7 @@ struct player
 {
     bool is_dealer = false;
     std::vector<card> hand;
+    double bankroll = 0.0;
 };
 
 namespace players

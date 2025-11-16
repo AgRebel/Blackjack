@@ -10,6 +10,8 @@
 
 #include <iostream>
 
+using namespace blackjack;
+
 auto setup_table(int num_players) -> std::pair<std::vector<player>, deck>
 {
     std::mt19937 generator(std::chrono::system_clock::now().time_since_epoch().count());
@@ -51,10 +53,10 @@ TEST_CASE("Dealing with 2 players")
     auto iter = top_cards.begin();
     for (int i = 0; i < num_players; ++i)
     {
-        for (auto&[is_dealer, hand] : players)
+        for (auto& p : players)
         {
-            REQUIRE(hand.at(i).s == iter->s);
-            REQUIRE(hand.at(i).r == iter->r);
+            REQUIRE(p.hand.at(i).s == iter->s);
+            REQUIRE(p.hand.at(i).r == iter->r);
             ++iter;
         }
     }
@@ -78,54 +80,101 @@ TEST_CASE("Hitting")
 
 TEST_CASE("Scoring")
 {
-    player p{.is_dealer = true,
-        .hand = {card{.s = cards::suit::SPADE, .r = cards::rank::ACE},
-                {card{.s = cards::suit::CLUB, .r = cards::rank::EIGHT}}}
-        };
+    std::vector<card> hand = {
+        card{.s = cards::suit::SPADE, .r = cards::rank::ACE},
+       card{.s = cards::suit::CLUB, .r = cards::rank::EIGHT}};
 
-    REQUIRE(p.hand.size() == 2);
+
+    REQUIRE(hand.size() == 2);
     // Ace + 8
-    REQUIRE(blackjack::hand_score(p.hand) == 19);
-    p.hand.emplace_back(card{.s = cards::suit::DIAMOND, .r = cards::rank::ACE});
+    REQUIRE(hand_score(hand) == 19);
+    hand.emplace_back(card{.s = cards::suit::DIAMOND, .r = cards::rank::ACE});
     // Ace + 8 + Ace
-    REQUIRE(blackjack::hand_score(p.hand) == 20);
+    REQUIRE(hand_score(hand) == 20);
     // Ace + 8 + Ace + 7
-    p.hand.emplace_back(card{.s = cards::suit::DIAMOND, .r = cards::rank::SEVEN});
-    REQUIRE(blackjack::hand_score(p.hand) == 17);
+    hand.emplace_back(card{.s = cards::suit::DIAMOND, .r = cards::rank::SEVEN});
+    REQUIRE(hand_score(hand) == 17);
 
-    p.hand.clear();
-    p.hand.emplace_back(card{.s = cards::suit::DIAMOND, .r = cards::rank::ACE});
-    p.hand.emplace_back(card{.s = cards::suit::DIAMOND, .r = cards::rank::TWO});
+    hand.clear();
+    hand.emplace_back(card{.s = cards::suit::DIAMOND, .r = cards::rank::ACE});
+    hand.emplace_back(card{.s = cards::suit::DIAMOND, .r = cards::rank::TWO});
     // Ace + 2
-    REQUIRE(blackjack::hand_score(p.hand) == 13);
+    REQUIRE(hand_score(hand) == 13);
+
+    // Blackjack
+    hand.clear();
+    hand.emplace_back(card{.s = cards::suit::DIAMOND, .r = cards::rank::ACE});
+    hand.emplace_back(card{.s = cards::suit::DIAMOND, .r = cards::rank::TEN});
+    REQUIRE(hand_score(hand) == MAX_SCORE);
+    REQUIRE(has_blackjack(hand));
+
+    hand.pop_back();
+    hand.emplace_back(card{.s = cards::suit::DIAMOND, .r = cards::rank::JACK});
+    REQUIRE(hand_score(hand) == MAX_SCORE);
+    REQUIRE(has_blackjack(hand));
+
+    hand.pop_back();
+    hand.emplace_back(card{.s = cards::suit::DIAMOND, .r = cards::rank::QUEEN});
+    REQUIRE(hand_score(hand) == MAX_SCORE);
+    REQUIRE(has_blackjack(hand));
+
+    hand.pop_back();
+    hand.emplace_back(card{.s = cards::suit::DIAMOND, .r = cards::rank::KING});
+    REQUIRE(hand_score(hand) == MAX_SCORE);
+    REQUIRE(has_blackjack(hand));
 }
 
 TEST_CASE("Automated games")
 {
     std::mt19937 generator(std::chrono::system_clock::now().time_since_epoch().count());
-    auto num_games = 100000;
+    constexpr auto num_games = 100000;
 
-    std::vector<blackjack::Winner> winners{};
+    std::vector<Winner> winners{};
+    std::vector<player> players{};
+    players.push_back(player{.is_dealer = true, .hand{}});
+    players.push_back(player{.is_dealer = false, .hand{}, .bankroll = 500.0});
 
     for (int i = 0; i < num_games; ++i)
     {
-        winners.emplace_back(blackjack::blackjack_game(generator, false, nullptr));
+        winners.emplace_back(blackjack_game(generator, players, false, nullptr));
     }
 
-    std::unordered_map<blackjack::Winner, int> win_counts;
+    std::unordered_map<Winner, int> win_counts;
     for (auto winner : winners)
     {
         win_counts[winner]++;
     }
 
-    const auto dealer_wins = win_counts[blackjack::Winner::DEALER];
-    const auto player_wins = win_counts[blackjack::Winner::PLAYER];
-    const auto pushes = win_counts[blackjack::Winner::PUSH];
+    REQUIRE(win_counts[Winner::DEALER] +
+            win_counts[Winner::PLAYER] +
+            win_counts[Winner::PUSH] +
+            win_counts[Winner::DEALER_BLACKJACK] +
+            win_counts[Winner::PLAYER_BLACKJACK]  == num_games);
+}
 
-    util::log(&std::cout, std::format("Number of games run: {}\n", num_games));
-    util::log(&std::cout, std::format("Dealer wins: {}\n", win_counts[blackjack::Winner::DEALER]));
-    util::log(&std::cout, std::format("Player wins: {}\n", win_counts[blackjack::Winner::PLAYER]));
-    util::log(&std::cout, std::format("Pushes: {}\n", win_counts[blackjack::Winner::PUSH]));
-
-    REQUIRE(dealer_wins + player_wins + pushes == num_games);
+TEST_CASE("Bet payouts")
+{
+    for (const Winner w : util::iterate_enum(Winner::DEALER, Winner::LAST))
+    {
+        constexpr double bet = 10;
+        switch(w)
+        {
+            case Winner::DEALER:
+            case Winner::DEALER_BLACKJACK:
+                REQUIRE(distribute_winnings(w, bet) == 0.0);
+                break;
+            case Winner::PLAYER_BLACKJACK:
+                REQUIRE(distribute_winnings(w, bet) == bet + bet * BLACKJACK_PAYOUT);
+                break;
+            case Winner::PLAYER:
+                REQUIRE(distribute_winnings(w, bet) == bet * 2.0);
+                break;
+            case Winner::PUSH:
+                REQUIRE(distribute_winnings(w, bet) == bet);
+                break;
+            default:
+                REQUIRE(distribute_winnings(w, bet) == bet);
+                break;
+        }
+    }
 }

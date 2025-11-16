@@ -9,12 +9,17 @@ namespace blackjack
     constexpr auto MAX_SCORE = 21;
     constexpr auto DEALER_HITS_ON_SOFT_17 = true;
     constexpr auto DEALER_STAND_TOTAL = 17;
+    constexpr auto MIN_BET = 5;
+    constexpr auto BLACKJACK_PAYOUT = 3.0 / 2.0;
 
     enum class Winner
     {
         DEALER = 0,
         PLAYER = 1,
-        PUSH = 2
+        PUSH = 2,
+        DEALER_BLACKJACK = 3,
+        PLAYER_BLACKJACK = 4,
+        LAST = 5
     };
 
     inline std::string to_string(const Winner& w)
