@@ -1,10 +1,11 @@
 #include "blackjack_utils.hpp"
 
-#include "../util/util.hpp"
+#include "util.hpp"
 
 #include "blackjack_rules.hpp"
 
 #include <algorithm>
+#include <iostream>
 
 namespace blackjack
 {
@@ -91,8 +92,10 @@ namespace blackjack
             case Winner::PLAYER_BLACKJACK:
                 return bet + bet * BLACKJACK_PAYOUT;
             case Winner::PUSH:
+            case Winner::BLACKJACK_PUSH:
                 return bet;
             default:
+                util::log(&std::cout, std::format("Got an unknown win condition {}\n", std::to_underlying(w)));
                 return bet;
         }
     }

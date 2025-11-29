@@ -156,7 +156,8 @@ TEST_CASE("Automated games")
             win_counts[Winner::PLAYER] +
             win_counts[Winner::PUSH] +
             win_counts[Winner::DEALER_BLACKJACK] +
-            win_counts[Winner::PLAYER_BLACKJACK]  == num_games);
+            win_counts[Winner::PLAYER_BLACKJACK] +
+            win_counts[Winner::BLACKJACK_PUSH] == num_games);
 }
 
 TEST_CASE("Bet payouts")
