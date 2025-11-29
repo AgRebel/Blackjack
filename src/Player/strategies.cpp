@@ -1,6 +1,6 @@
 #include "strategies.hpp"
 
-#include "blackjack_game_utils.hpp"
+#include "blackjack_utils.hpp"
 #include "blackjack_rules.hpp"
 
 namespace strategies

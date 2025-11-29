@@ -1,4 +1,4 @@
-#include "blackjack_game_utils.hpp"
+#include "blackjack_utils.hpp"
 
 #include "../util/util.hpp"
 

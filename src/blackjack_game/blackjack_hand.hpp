@@ -1,5 +1,5 @@
-#ifndef BLACKJACK_BLACKJACK_GAME_HPP
-#define BLACKJACK_BLACKJACK_GAME_HPP
+#ifndef BLACKJACK_BLACKJACK_HAND_HPP
+#define BLACKJACK_BLACKJACK_HAND_HPP
 
 #include "blackjack_rules.hpp"
 #include "deck.hpp"
@@ -11,12 +11,12 @@
 
 namespace blackjack
 {
-    auto blackjack_game(std::mt19937& generator,
+    auto blackjack_hand(std::mt19937& generator,
                         std::vector<player>& players,
                         deck &cards,
                         bool manual = true,
                         std::ostream* os = &std::cout,
-                        const strategy &s = strategies::simple_strategy) -> Winner;
+                        const strategy &strat = strategies::simple_strategy) -> Winner;
 }
 
-#endif //BLACKJACK_BLACKJACK_GAME_HPP
+#endif //BLACKJACK_BLACKJACK_HAND_HPP
