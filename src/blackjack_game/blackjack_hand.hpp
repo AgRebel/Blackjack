@@ -16,7 +16,7 @@ namespace blackjack
                         deck &cards,
                         bool manual = true,
                         std::ostream* os = &std::cout,
-                        const strategy &s = strategies::simple_strategy) -> Winner;
+                        const strategy &strat = strategies::simple_strategy) -> Winner;
 }
 
 #endif //BLACKJACK_BLACKJACK_HAND_HPP

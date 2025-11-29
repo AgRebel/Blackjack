@@ -12,7 +12,8 @@ namespace blackjack
 {
     auto run_auto_blackjack_hands(std::mt19937& generator,
                                   const int num_hands,
-                                  const bool log_games_to_std_out) -> void
+                                  const bool log_games_to_std_out,
+                                  const strategy& strat) -> void
     {
         const auto start_time = std::chrono::system_clock::now().time_since_epoch();
         std::ostream* os = log_games_to_std_out ? &std::cout : nullptr;
@@ -43,7 +44,7 @@ namespace blackjack
             util::log(os, std::format("Game {}\n", i + 1));
             auto& bankroll = player1.bankroll;
             bankroll -= MIN_BET;
-            auto winner = blackjack_hand(generator, players, shoe.cards, false, os, strategies::simple_strategy);
+            auto winner = blackjack_hand(generator, players, shoe.cards, false, os, strat);
             winners.emplace_back(winner);
             bankroll += distribute_winnings(winner, MIN_BET);
 

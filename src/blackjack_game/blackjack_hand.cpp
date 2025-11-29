@@ -69,7 +69,7 @@ namespace blackjack
                         deck& cards,
                         const bool manual,
                         std::ostream* os,
-                        const strategy &s) -> Winner
+                        const strategy &strat) -> Winner
     {
         auto& dealer = players.front();
         auto& player1 = players.at(1);
@@ -90,7 +90,7 @@ namespace blackjack
 
         // player(s)' turn(s); could be manual or automated
         manual ? manual_player_turn(player1, cards) :
-                 automated_player_turn(player1, cards, dealer.hand.at(0), s);
+                 automated_player_turn(player1, cards, dealer.hand.at(0), strat);
 
         // dealer turn; dealer always automated according to rules
         dealer_turn(dealer, cards);
