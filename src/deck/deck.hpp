@@ -14,7 +14,7 @@ namespace decks
     // We will reshuffle if shoe has between low_bound and upper_bound cards left, randomly
     // this represents the idea of the "cut card" that vegas puts in a shoe of cards
     constexpr auto VEGAS_RESHUFFLE_LOW_BOUND = DECK_SIZE;
-    constexpr auto VEGAS_RESHUFFLE_UPPER_BOUND = DECK_SIZE *2;
+    constexpr auto VEGAS_RESHUFFLE_UPPER_BOUND = DECK_SIZE * 2;
 } // namespace decks
 
 using deck = std::deque<card>;

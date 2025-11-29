@@ -1,5 +1,5 @@
-#include "blackjack_game.hpp"
-#include "blackjack_game_utils.hpp"
+#include "blackjack_hand.hpp"
+#include "blackjack_utils.hpp"
 #include "blackjack_rules.hpp"
 #include "card.hpp"
 #include "deck.hpp"
@@ -45,7 +45,7 @@ TEST_CASE("Dealing with 2 players")
     blackjack::initial_deal(players, s.cards);
 
     util::log(&std::cout, "Hands:\n");
-    for (const auto p : players)
+    for (const auto& p : players)
     {
         util::log(&std::cout, std::format("{}\n", players::get_hand_str(p.hand)));
     }
@@ -137,7 +137,7 @@ TEST_CASE("Automated games")
 
     for (int i = 0; i < num_games; ++i)
     {
-        winners.emplace_back(blackjack_game(generator, players, d, false, nullptr));
+        winners.emplace_back(blackjack_hand(generator, players, d, false, nullptr));
         //Re-shuffle the deck back to full if size < 20 to prevent running out of cards
         if (d.size() < 20)
         {

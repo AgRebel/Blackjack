@@ -1,6 +1,6 @@
-#include "blackjack_game.hpp"
+#include "blackjack_hand.hpp"
 
-#include "blackjack_game_utils.hpp"
+#include "blackjack_utils.hpp"
 #include "blackjack_rules.hpp"
 #include "player.hpp"
 #include "strategies.hpp"
@@ -64,7 +64,7 @@ namespace
 
 namespace blackjack
 {
-    auto blackjack_game(std::mt19937& generator,
+    auto blackjack_hand(std::mt19937& generator,
                         std::vector<player>& players,
                         deck& cards,
                         const bool manual,
