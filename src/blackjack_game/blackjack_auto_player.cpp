@@ -95,9 +95,10 @@ namespace blackjack
         util::log(&std::cout, std::format("Min bankroll: {} at game {}\n", min_bankroll, min_bankroll_game));
         util::log(&std::cout, std::format("Dealer wins minus blackjack: {}\n", win_counts[Winner::DEALER]));
         util::log(&std::cout, std::format("Player wins minus blackjack: {}\n", win_counts[Winner::PLAYER]));
-        util::log(&std::cout, std::format("Player blackjacks: {}\n", win_counts[Winner::PLAYER_BLACKJACK]));
-        util::log(&std::cout, std::format("Dealer blackjacks: {}\n", win_counts[Winner::DEALER_BLACKJACK]));
+        util::log(&std::cout, std::format("Player blackjacks (including pushes): {}\n", win_counts[Winner::PLAYER_BLACKJACK] + win_counts[Winner::BLACKJACK_PUSH]));
+        util::log(&std::cout, std::format("Dealer blackjacks (including pushes): {}\n", win_counts[Winner::DEALER_BLACKJACK] + win_counts[Winner::BLACKJACK_PUSH]));
         util::log(&std::cout, std::format("Pushes: {}\n", win_counts[Winner::PUSH]));
+        util::log(&std::cout, std::format("Blackjack Pushes: {}\n", win_counts[Winner::BLACKJACK_PUSH]));
         util::log(&std::cout, std::format("Ending bankroll: {}\n", player1.bankroll));
         util::log(&std::cout, std::format("Time taken: {}ms", time_spent));
     }

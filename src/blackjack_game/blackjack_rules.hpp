@@ -19,16 +19,23 @@ namespace blackjack
         PUSH = 2,
         DEALER_BLACKJACK = 3,
         PLAYER_BLACKJACK = 4,
-        LAST = 5
+        BLACKJACK_PUSH = 5,
+        LAST = 6
     };
 
     inline std::string to_string(const Winner& w)
     {
         switch(w)
         {
-            case Winner::DEALER: return "Dealer";
-            case Winner::PLAYER: return "Player";
-            case Winner::PUSH: return "Push";
+            case Winner::DEALER:
+            case Winner::DEALER_BLACKJACK:
+                return "Dealer";
+            case Winner::PLAYER:
+            case Winner::PLAYER_BLACKJACK:
+                return "Player";
+            case Winner::BLACKJACK_PUSH:
+            case Winner::PUSH:
+                return "Push";
             default: return "Unknown result";
         }
     }

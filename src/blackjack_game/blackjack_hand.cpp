@@ -81,6 +81,10 @@ namespace blackjack
         initial_deal(players, cards);
         if (has_blackjack(dealer.hand))
         {
+            if (has_blackjack(player1.hand))
+            {
+                return Winner::BLACKJACK_PUSH;
+            }
             return Winner::DEALER_BLACKJACK;
         }
         if (has_blackjack(player1.hand))
