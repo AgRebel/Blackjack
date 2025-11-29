@@ -1,6 +1,7 @@
 #include "blackjack_game.hpp"
 
 #include "blackjack_game_utils.hpp"
+#include "blackjack_rules.hpp"
 #include "player.hpp"
 #include "strategies.hpp"
 #include "util.hpp"
@@ -10,22 +11,20 @@
 #include <functional>
 #include <iostream>
 
-#include "blackjack_rules.hpp"
-
 namespace
 {
-    auto dealer_turn(player& dealer, deck& d) -> void
+    auto dealer_turn(player& dealer, deck& cards) -> void
     {
         using namespace blackjack;
         auto score = hand_score(dealer.hand);
         while (score < DEALER_STAND_TOTAL or (score == DEALER_STAND_TOTAL and has_ace(dealer.hand) and DEALER_HITS_ON_SOFT_17))
         {
-            hit(dealer, d);
+            hit(dealer, cards);
             score = hand_score(dealer.hand);
         }
     }
 
-    auto manual_player_turn(player& p, deck& d) -> void
+    auto manual_player_turn(player& p, deck& cards) -> void
     {
         using namespace blackjack;
         std::ostream* os = &std::cout;
@@ -38,7 +37,7 @@ namespace
             std::cin >> play;
             if (play == 'h')
             {
-                hit(p, d);
+                hit(p, cards);
             }
             else if (play != 's')
             {
@@ -51,13 +50,13 @@ namespace
         }
     }
 
-    auto automated_player_turn(player& p, deck& d, const card& dealer_card, const strategy &strat) -> void
+    auto automated_player_turn(player& p, deck& cards, const card& dealer_card, const strategy &strat) -> void
     {
         using namespace blackjack;
         auto hit_or_stay = strat(p.hand, dealer_card.r);
         while (hit_or_stay and hand_score(p.hand) < MAX_SCORE)
         {
-            hit(p, d);
+            hit(p, cards);
             hit_or_stay = strat(p.hand, dealer_card.r);
         }
     }
@@ -67,14 +66,11 @@ namespace blackjack
 {
     auto blackjack_game(std::mt19937& generator,
                         std::vector<player>& players,
+                        deck& cards,
                         const bool manual,
                         std::ostream* os,
                         const strategy &s) -> Winner
     {
-        auto d = create_deck();
-
-        shuffle_deck(d, generator);
-
         auto& dealer = players.front();
         auto& player1 = players.at(1);
 
@@ -82,7 +78,7 @@ namespace blackjack
         dealer.hand.clear();
         player1.hand.clear();
 
-        initial_deal(players, d);
+        initial_deal(players, cards);
         if (has_blackjack(dealer.hand))
         {
             return Winner::DEALER_BLACKJACK;
@@ -93,11 +89,11 @@ namespace blackjack
         }
 
         // player(s)' turn(s); could be manual or automated
-        manual ? manual_player_turn(player1, d) :
-                 automated_player_turn(player1, d, dealer.hand.at(0), s);
+        manual ? manual_player_turn(player1, cards) :
+                 automated_player_turn(player1, cards, dealer.hand.at(0), s);
 
         // dealer turn; dealer always automated according to rules
-        dealer_turn(dealer, d);
+        dealer_turn(dealer, cards);
 
         const auto dealer_score = hand_score(dealer.hand);
         const auto player_score = hand_score(player1.hand);

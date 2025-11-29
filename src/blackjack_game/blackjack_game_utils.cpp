@@ -41,9 +41,9 @@ namespace blackjack
         return false;
     }
 
-    auto hit(player& p, deck& d) -> void
+    auto hit(player& p, deck& cards) -> void
     {
-        p.hand.emplace_back((top_card(d)));
+        p.hand.emplace_back((top_card(cards)));
     }
 
     auto initial_deal(std::vector<player>& players, deck& d) -> void
@@ -57,10 +57,10 @@ namespace blackjack
         }
     }
 
-    auto top_card(deck& d) -> card
+    auto top_card(deck& cards) -> card
     {
-        const auto c = d.cards.front();
-        d.cards.pop_front();
+        const auto c = cards.front();
+        cards.pop_front();
         return c;
     }
 

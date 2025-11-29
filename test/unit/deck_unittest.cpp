@@ -7,9 +7,9 @@
 #include <iostream>
 #include <ranges>
 
-auto print_two_decks(const deck& d1, const deck&d2) -> void
+auto print_two_decks(const deck& d1, const deck& d2) -> void
 {
-    util::log(&std::cout, std::format("first deck:{}\nsecond deck:\n{}\n\b", get_compact_deck_string(d1), get_compact_deck_string(d2)));
+    util::log(&std::cout, std::format("first deck:{}\nsecond deck:\n{}\n\b", get_compact_str(d1), get_compact_str(d2)));
 }
 
 TEST_CASE("Deck creation")
@@ -41,8 +41,8 @@ TEST_CASE("Deck creation")
     REQUIRE(num_ranks.size() == static_cast<int>(cards::rank::LAST) - 1); // because rank starts at 1
 
     auto d = create_deck();
-    REQUIRE(d.cards.size() == decks::DECK_SIZE);
-    for (auto c : d.cards)
+    REQUIRE(d.size() == decks::DECK_SIZE);
+    for (auto c : d)
     {
         num_ranks[c.r]++;
         num_suits[c.s]++;
@@ -65,11 +65,11 @@ TEST_CASE("Shuffling")
     auto unshuffled = create_deck();
     auto shuffled = create_deck();
 
-    REQUIRE(unshuffled.cards.size() == decks::DECK_SIZE);
-    REQUIRE(shuffled.cards.size() == decks::DECK_SIZE);
+    REQUIRE(unshuffled.size() == decks::DECK_SIZE);
+    REQUIRE(shuffled.size() == decks::DECK_SIZE);
 
     // Require that we have two identical unshuffled decks
-    for (auto const& [s, u] : std::views::zip(unshuffled.cards, shuffled.cards))
+    for (auto const& [s, u] : std::views::zip(unshuffled, shuffled))
     {
         REQUIRE(s.r == u.r);
         REQUIRE(s.s == u.s);
@@ -77,10 +77,10 @@ TEST_CASE("Shuffling")
 
     print_two_decks(unshuffled, shuffled);
 
-    shuffle_deck(shuffled, generator);
+    shuffle(shuffled, generator);
 
     auto not_identical = 0;
-    for (auto const& [s, u] : std::views::zip(unshuffled.cards, shuffled.cards))
+    for (auto const& [s, u] : std::views::zip(unshuffled, shuffled))
     {
         if (s.r != u.r or s.s != u.s)
         {
@@ -92,9 +92,9 @@ TEST_CASE("Shuffling")
     REQUIRE(not_identical > 0);
 
     generator.seed(std::chrono::system_clock::now().time_since_epoch().count());
-    shuffle_deck(unshuffled, generator);
+    shuffle(unshuffled, generator);
     not_identical = 0;
-    for (auto const& [s, u] : std::views::zip(unshuffled.cards, shuffled.cards))
+    for (auto const& [s, u] : std::views::zip(unshuffled, shuffled))
     {
         if (s.r != u.r or s.s != u.s)
         {
@@ -104,4 +104,27 @@ TEST_CASE("Shuffling")
     print_two_decks(unshuffled, shuffled);
     // This test could fail once every (8.0658 x 10 ^ 67)^2 tries on average.  I will definitely live with it.
     REQUIRE(not_identical > 0);
+}
+
+TEST_CASE("Shoes")
+{
+    WHEN("Creating a shoe with 2 decks")
+    {
+        auto shoe_size = 2;
+        auto shoe = create_shoe(shoe_size);
+        THEN("Shoe size is DECK_SIZE * 2 (104 with a standard 52 card deck)")
+        {
+            REQUIRE(shoe.cards.size() == decks::DECK_SIZE * shoe_size);
+        }
+    }
+    WHEN("Creating a shoe with 6 decks (standard vegas size)")
+    {
+        auto shoe_size = 6;
+        auto shoe = create_shoe(shoe_size);
+        THEN("Shoe size is DECK_SIZE * 6 (312 with a standard 52 card deck)")
+        {
+            REQUIRE(shoe.cards.size() == decks::DECK_SIZE * shoe_size);
+        }
+    }
+
 }

@@ -18,6 +18,7 @@ int main() {
     // Random generator setup
     const auto start_time = std::chrono::system_clock::now().time_since_epoch();
     std::mt19937 generator(start_time.count());
+    std::uniform_int_distribution<int> dist(decks::VEGAS_RESHUFFLE_LOW_BOUND, decks::VEGAS_RESHUFFLE_UPPER_BOUND);
 
     // One dealer and one player for now
     std::vector<player> players{};
@@ -33,14 +34,26 @@ int main() {
     int max_bankroll_game = 1;
     double min_bankroll = max_bankroll;
     int min_bankroll_game = 1;
+    auto shoe = create_shoe(decks::VEGAS_SHOE_SIZE);
+    shuffle(shoe.cards, generator);
+
+    shoe.cut_card = dist(generator);
+
     for (int i = 0; i < NUM_HANDS; ++i)
     {
         util::log(os, std::format("Game {}\n", i + 1));
         auto& bankroll = player1.bankroll;
         bankroll -= blackjack::MIN_BET;
-        auto winner = blackjack::blackjack_game(generator, players, false, os, strategies::simple_strategy);
+        auto winner = blackjack::blackjack_game(generator, players, shoe.cards, false, os, strategies::simple_strategy);
         winners.emplace_back(winner);
         bankroll += blackjack::distribute_winnings(winner, blackjack::MIN_BET);
+
+        if (shoe.cards.size() <= shoe.cut_card)
+        {
+            shoe = create_shoe(decks::VEGAS_SHOE_SIZE);
+            shuffle(shoe.cards, generator);
+            shoe.cut_card = dist(generator);
+        }
 
         if (not broke and bankroll < blackjack::MIN_BET)
         {
