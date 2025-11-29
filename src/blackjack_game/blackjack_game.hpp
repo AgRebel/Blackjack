@@ -2,6 +2,7 @@
 #define BLACKJACK_BLACKJACK_GAME_HPP
 
 #include "blackjack_rules.hpp"
+#include "deck.hpp"
 #include "player.hpp"
 #include "strategies.hpp"
 
@@ -12,6 +13,7 @@ namespace blackjack
 {
     auto blackjack_game(std::mt19937& generator,
                         std::vector<player>& players,
+                        deck &cards,
                         bool manual = true,
                         std::ostream* os = &std::cout,
                         const strategy &s = strategies::simple_strategy) -> Winner;

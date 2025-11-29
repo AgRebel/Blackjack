@@ -12,7 +12,7 @@
 
 using namespace blackjack;
 
-auto setup_table(int num_players) -> std::pair<std::vector<player>, deck>
+auto setup_table(const int num_players) -> std::pair<std::vector<player>, shoe>
 {
     std::mt19937 generator(std::chrono::system_clock::now().time_since_epoch().count());
     std::vector players{
@@ -24,8 +24,8 @@ auto setup_table(int num_players) -> std::pair<std::vector<player>, deck>
         players.emplace_back(player{.is_dealer = false, .hand = {}});
     }
 
-    auto d = create_deck();
-    shuffle_deck(d, generator);
+    auto d = create_shoe(1);
+    shuffle(d.cards, generator);
 
     return {players, d};
 }
@@ -33,16 +33,16 @@ auto setup_table(int num_players) -> std::pair<std::vector<player>, deck>
 TEST_CASE("Dealing with 2 players")
 {
     constexpr auto num_players = 2;
-    auto [players, d] = setup_table(num_players);
+    auto [players, s] = setup_table(num_players);
 
     std::vector<card> top_cards = {};
     for (int i = 0; i < 2 * num_players; ++i)
     {
-        top_cards.emplace_back(d.cards.at(i));
+        top_cards.emplace_back(s.cards.at(i));
     }
-    util::log(&std::cout, std::format("Deck:\n{}\n", get_compact_deck_string(d)));
+    util::log(&std::cout, std::format("Deck:\n{}\n", get_compact_str(s.cards)));
 
-    blackjack::initial_deal(players, d);
+    blackjack::initial_deal(players, s.cards);
 
     util::log(&std::cout, "Hands:\n");
     for (const auto p : players)
@@ -60,21 +60,21 @@ TEST_CASE("Dealing with 2 players")
             ++iter;
         }
     }
-    util::log(&std::cout, std::format("Deck:\n{}\n", get_compact_deck_string(d)));
+    util::log(&std::cout, std::format("Deck:\n{}\n", get_compact_str(s.cards)));
 }
 
 TEST_CASE("Hitting")
 {
     constexpr auto num_players = 2;
-    auto [players, d] = setup_table(num_players);
+    auto [players, s] = setup_table(num_players);
 
-    blackjack::initial_deal(players, d);
+    blackjack::initial_deal(players, s.cards);
     REQUIRE(players[1].hand.size() == 2);
 
     //Hit a few times
-    blackjack::hit(players[1], d);
+    blackjack::hit(players[1], s.cards);
     REQUIRE(players[1].hand.size() == 3);
-    blackjack::hit(players[1], d);
+    blackjack::hit(players[1], s.cards);
     REQUIRE(players[1].hand.size() == 4);
 }
 
@@ -133,10 +133,17 @@ TEST_CASE("Automated games")
     std::vector<player> players{};
     players.push_back(player{.is_dealer = true, .hand{}});
     players.push_back(player{.is_dealer = false, .hand{}, .bankroll = 500.0});
+    auto d = create_deck();
 
     for (int i = 0; i < num_games; ++i)
     {
-        winners.emplace_back(blackjack_game(generator, players, false, nullptr));
+        winners.emplace_back(blackjack_game(generator, players, d, false, nullptr));
+        //Re-shuffle the deck back to full if size < 20 to prevent running out of cards
+        if (d.size() < 20)
+        {
+            d = create_deck();
+            shuffle(d, generator);
+        }
     }
 
     std::unordered_map<Winner, int> win_counts;

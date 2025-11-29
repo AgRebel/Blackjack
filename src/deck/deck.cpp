@@ -8,7 +8,7 @@
 
 auto create_deck() -> deck
 {
-    std::deque<card> d;
+    deck d;
     for (const cards::suit s : util::iterate_enum(cards::suit::HEART, cards::suit::LAST))
     {
         for (const cards::rank r : util::iterate_enum(cards::rank::ACE, cards::rank::LAST))
@@ -17,20 +17,32 @@ auto create_deck() -> deck
         }
     }
 
-    return deck{.cards = std::move(d)};
+    return d;
 }
 
-auto get_compact_deck_string(const deck &d) -> std::string
+auto create_shoe(const int num_decks) -> shoe
 {
-    std::string deck_string;
-    for (const auto [s, r] : d.cards)
+    deck d;
+    for (int i = 0; i < num_decks; ++i)
     {
-        deck_string.append(cards::get_short_rank_str(r) + cards::get_suit_symbol(s) + " ");
+        auto cards = create_deck();
+        d.insert(d.end(), cards.begin(), cards.end());
     }
-    return deck_string;
+    return shoe{.cards = std::move(d), .num_decks = num_decks, .cut_card = decks::VEGAS_RESHUFFLE_LOW_BOUND};
 }
 
-auto shuffle_deck(deck& d, std::mt19937& g) -> void
+auto get_compact_str(const deck &d) -> std::string
 {
-    std::ranges::shuffle(d.cards, g);
+    std::string result;
+    for (const auto [s, r] : d)
+    {
+        result.append(cards::get_short_rank_str(r) + cards::get_suit_symbol(s) + " ");
+    }
+    return result;
 }
+
+auto shuffle(deck& cards, std::mt19937& g) -> void
+{
+    std::ranges::shuffle(cards, g);
+}
+
